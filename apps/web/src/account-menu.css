@@ -1,0 +1,30 @@
+.account-menu {
+  position: relative;
+}
+.account-menu summary {
+  cursor: pointer;
+  list-style: none;
+}
+.account-popover {
+  position: absolute;
+  left: 0;
+  top: 48px;
+  background: #fff;
+  border: 1px solid #e1e8e0;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px #173f3915;
+  min-width: 230px;
+  z-index: 40;
+}
+.account-popover strong {
+  font-size: 12px;
+}
+.account-popover small {
+  margin-top: 8px;
+}
+.account-popover button {
+  margin-top: 16px;
+  font-size: 11px;
+  color: #925151;
+}

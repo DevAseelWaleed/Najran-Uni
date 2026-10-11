@@ -1,0 +1,36 @@
+{
+  "name": "faculty-portal",
+  "private": true,
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "mail:verify": "node scripts/run.mjs mail:verify",
+    "dev": "node scripts/run.mjs dev",
+    "build": "node scripts/run.mjs build",
+    "test": "node scripts/run.mjs test",
+    "db:generate": "node scripts/run.mjs db:generate",
+    "db:migrate": "node scripts/run.mjs db:migrate",
+    "db:init": "node scripts/run.mjs db:init",
+    "test:e2e": "node scripts/run.mjs test:e2e",
+    "dev:services": "node scripts/run.mjs dev:services",
+    "db:references": "node scripts/run.mjs db:references",
+    "format": "prettier --write \"apps/**/*.{ts,tsx,css,json,js}\" \"e2e/**/*.ts\" \"scripts/*.{mjs,cjs}\" \"docs/*.md\" README.md playwright.config.ts package.json"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.51.1",
+    "@types/smtp-server": "^3.5.13",
+    "concurrently": "^9.1.2",
+    "embedded-postgres": "^18.4.0-beta.17",
+    "smtp-server": "^3.19.21",
+    "typescript": "~5.7.3",
+    "prettier": "^3.5.3"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "overrides": {
+    "multer": "^2.0.2",
+    "uuid": "^11.1.0"
+  }
+}

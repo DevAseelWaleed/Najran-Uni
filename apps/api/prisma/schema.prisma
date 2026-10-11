@@ -1,0 +1,189 @@
+generator client {
+  provider = "prisma-client-js"
+}
+datasource db {
+  provider = "postgresql"
+  url = env("DATABASE_URL")
+}
+model Role {
+  id String @id
+  label String
+  users User[]
+  permissions RolePermission[]
+}
+model Permission {
+  id String @id
+  roles RolePermission[]
+}
+model RolePermission {
+  roleId String
+  permissionId String
+  role Role @relation(fields: [roleId], references: [id])
+  permission Permission @relation(fields: [permissionId], references: [id])
+  @@id([roleId, permissionId])
+}
+model User {
+  id String @id @default(uuid())
+  fullName String
+  username String @unique
+  email String @unique
+  passwordHash String?
+  roleId String
+  role Role @relation(fields: [roleId], references: [id])
+  active Boolean @default(true)
+  lastLogin DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  sessions Session[]
+  challenges OTPChallenge[]
+  resets PasswordReset[]
+  documents FacultyDocument[]
+  audits AuditLog[]
+  imports ImportJob[]
+}
+model OTPChallenge {
+  id String @id @default(uuid())
+  userId String
+  user User @relation(fields: [userId], references: [id])
+  secretHash String
+  attempts Int @default(0)
+  expiresAt DateTime
+  sentAt DateTime @default(now())
+  consumedAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@index([userId, createdAt])
+}
+model PasswordReset {
+  id String @id @default(uuid())
+  userId String
+  user User @relation(fields: [userId], references: [id])
+  tokenHash String @unique
+  expiresAt DateTime
+  consumedAt DateTime?
+  createdAt DateTime @default(now())
+}
+model Session {
+  id String @id @default(uuid())
+  tokenHash String @unique
+  csrf String
+  userId String
+  user User @relation(fields: [userId], references: [id])
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  @@index([expiresAt])
+}
+model College {
+  id String @id @default(uuid())
+  name String @unique
+  departments Department[]
+  faculty FacultyMember[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+model Department {
+  id String @id @default(uuid())
+  name String
+  collegeId String
+  college College @relation(fields: [collegeId], references: [id])
+  faculty FacultyMember[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@unique([collegeId, name])
+  @@unique([id, collegeId])
+}
+model FacultyMember {
+  id String @id @default(uuid())
+  employeeNumber String
+  fullName String
+  englishName String?
+  gender String?
+  birthDate DateTime?
+  nationality String?
+  mobile String?
+  email String
+  collegeId String
+  college College @relation(fields: [collegeId], references: [id])
+  departmentId String
+  department Department @relation(fields: [departmentId, collegeId], references: [id, collegeId])
+  highestQualification String
+  generalSpecialization String?
+  specificSpecialization String?
+  academicRank String
+  awardingUniversity String?
+  awardingCountry String?
+  graduationYear Int?
+  researchInterests String?
+  jobTitle String?
+  appointmentDate DateTime?
+  joiningDate DateTime?
+  employmentType String
+  employmentStatus String
+  administrativePosition String?
+  officeNumber String?
+  officePhone String?
+  qualifications Qualification[]
+  documents FacultyDocument[]
+  deletedAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@unique([collegeId, employeeNumber])
+  @@index([departmentId, employmentStatus, academicRank])
+  @@index([highestQualification, employmentType])
+  @@index([fullName])
+  @@index([appointmentDate])
+  @@index([deletedAt])
+}
+model Qualification {
+  id String @id @default(uuid())
+  facultyId String
+  faculty FacultyMember @relation(fields: [facultyId], references: [id])
+  degree String
+  university String
+  country String?
+  year Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+model FacultyDocument {
+  id String @id @default(uuid())
+  facultyId String
+  faculty FacultyMember @relation(fields: [facultyId], references: [id])
+  originalName String
+  storageKey String @unique
+  mime String
+  size Int
+  category String
+  uploaderId String
+  uploader User @relation(fields: [uploaderId], references: [id])
+  deletedAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@index([facultyId, deletedAt])
+}
+model AuditLog {
+  id String @id @default(uuid())
+  actorId String?
+  actor User? @relation(fields: [actorId], references: [id])
+  action String
+  target String?
+  summary Json?
+  createdAt DateTime @default(now())
+  @@index([createdAt])
+}
+model ImportJob {
+  id String @id @default(uuid())
+  userId String
+  user User @relation(fields: [userId], references: [id])
+  status String @default("PREVIEW")
+  rows Json
+  errors Json
+  imported Int @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+model Setting {
+  key String @id
+  value Json
+  updatedAt DateTime @updatedAt
+}
