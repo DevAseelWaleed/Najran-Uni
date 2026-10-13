@@ -54,6 +54,7 @@ npm audit
 - [الخطة والمعمارية](docs/ARCHITECTURE.md)
 - [عقود API](docs/API.md)
 - [دليل النشر](docs/DEPLOYMENT.md)
+- [النشر التجريبي المجاني على Render وSupabase وBrevo](docs/FREE_DEPLOYMENT.md)
 - [دليل المدير](docs/ADMIN.md)
 - [تقرير التنفيذ والتحقق](docs/REPORT.md)
 

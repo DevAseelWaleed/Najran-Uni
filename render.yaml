@@ -1,0 +1,45 @@
+# Create manually with New > Web Service if Blueprint asks for billing details.
+services:
+  - type: web
+    name: najran-faculty-portal
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /healthz
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: HOST
+        value: 0.0.0.0
+      - key: PORT
+        value: 10000
+      - key: SERVE_WEB
+        value: 'true'
+      - key: TRUST_PROXY_HOPS
+        value: '1'
+      - key: STORAGE_PROVIDER
+        value: supabase
+      - key: SUPABASE_STORAGE_BUCKET
+        value: portal-documents
+      - key: MAIL_PROVIDER
+        value: brevo
+      - key: PDF_BROWSER_CHANNEL
+        value: chromium
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: DATABASE_URL
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: BREVO_API_KEY
+        sync: false
+      - key: SMTP_FROM
+        sync: false
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_USERNAME
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false

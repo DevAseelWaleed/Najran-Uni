@@ -12,6 +12,8 @@ import { ImportController } from './imports';
 import { ExportController } from './exports';
 import { AccessGuard } from './security';
 import { db } from './db';
+import { validateCloudConfig } from './cloud-config';
+import { mountWeb } from './web-host';
 @Catch()
 class Errors implements ExceptionFilter {
   catch(error: any, host: ArgumentsHost) {
@@ -56,12 +58,8 @@ class AppModule {}
 async function main() {
   if (!process.env.SESSION_SECRET || process.env.SESSION_SECRET.length < 32)
     throw new Error('SESSION_SECRET must contain at least 32 characters');
-  if (
-    process.env.NODE_ENV === 'production' &&
-    (!process.env.APP_ORIGIN?.startsWith('https://') ||
-      ['localhost', 'mailpit', '127.0.0.1'].includes(process.env.SMTP_HOST || ''))
-  )
-    throw new Error('Production requires HTTPS origin and real SMTP');
+  process.env.APP_ORIGIN ||= process.env.RENDER_EXTERNAL_URL;
+  validateCloudConfig();
   await db.$connect();
   const app = await NestFactory.create(AppModule, { logger: ['error', 'warn', 'log'] });
   app.setGlobalPrefix('api');
@@ -70,6 +68,7 @@ async function main() {
     throw new Error('TRUST_PROXY_HOPS must be 0, 1 or 2');
   if (proxyHops) app.getHttpAdapter().getInstance().set('trust proxy', proxyHops);
   app.use(helmet());
+  if (process.env.SERVE_WEB === 'true') mountWeb(app.getHttpAdapter().getInstance());
   app.use(cookieParser());
   app.enableCors({ origin: process.env.APP_ORIGIN, credentials: true });
   app.useGlobalFilters(new Errors());
@@ -98,7 +97,7 @@ async function main() {
     next();
   });
   app.enableShutdownHooks();
-  await app.listen(Number(process.env.PORT || 3000), '127.0.0.1');
+  await app.listen(Number(process.env.PORT || 3000), process.env.HOST || '127.0.0.1');
 }
 main().catch((e) => {
   console.error(e.message);

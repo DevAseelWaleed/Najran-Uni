@@ -137,8 +137,14 @@ beforeAll(async () => {
     stdio: 'pipe',
   });
   server.stderr?.on('data', (chunk) => (serverErrors += chunk.toString()));
+  server.on('error', () => (serverErrors += 'Unable to spawn test API'));
   let ready = false;
-  for (let i = 0; i < 100; i++) {
+  const startupDeadline = Date.now() + 60000;
+  while (Date.now() < startupDeadline) {
+    if (server.exitCode !== null) {
+      serverErrors += `Test API exited with code ${server.exitCode}`;
+      break;
+    }
     try {
       const r = await fetch(base + '/branding');
       if (r.ok) {

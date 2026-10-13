@@ -100,7 +100,10 @@ test.beforeAll(async () => {
       stdio: 'ignore',
     },
   );
-  for (let i = 0; i < 100; i++) {
+  const startupDeadline = Date.now() + 60000;
+  while (Date.now() < startupDeadline) {
+    if (api.exitCode !== null || web.exitCode !== null)
+      throw new Error('E2E service exited before becoming ready');
     try {
       const r = await fetch('http://localhost:5198/api/branding');
       if (r.ok) return;
