@@ -22,7 +22,8 @@ COPY --from=build /app/apps/web/dist ./apps/web/dist
 COPY --from=build /app/package.json /app/package-lock.json ./
 COPY scripts/cloud-start.mjs ./scripts/cloud-start.mjs
 RUN npx playwright install --with-deps chromium \
-    && chmod -R a+rX /opt/playwright
+    && chmod -R a+rX /opt/playwright \
+    && chown -R node:node /app
 USER node
 EXPOSE 10000
 CMD ["node", "scripts/cloud-start.mjs"]
